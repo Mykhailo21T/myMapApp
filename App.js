@@ -1,36 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 
 export default function App() {
-  const [longitude, setLongitude] = useState();
-  const [latitude, setLatitude] = useState();
+  const [long, setLong] = useState("");
+  const [lat, setLat] = useState("");
 
   useEffect(() => {
-    // Accepts the current latitude and longitude
-    // and updates the state variables
-    function setPosition({ coords: { latitude, longitude } }) {
-      setLongitude(longitude);
-      setLatitude(latitude);
-    }
-
-    // Use navigator to get access to the devices' GPS
-    console.log(navigator);
-    navigator.geolocation.getCurrentPosition(setPosition);
-
-    // Update the coordinates as the device is moved
-    let watcher = navigator.geolocation.watchPosition(
-      setPosition,
-      (err) => console.error(err),
-      { enableHighAccuracy: true }
-    );
-
-    // When the component is unmounted, clear the watcher
-    // since it is no longer necessary to track location
-    return () => {
-      navigator.geolocation.clearWatch(watcher);
-    };
+    getLocation();
   }, []);
+
+  async function getLocation() {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert("Permission Error", "Permission to access location was denied");
+      return;
+    }
+    const location = await Location.getCurrentPositionAsync();
+    console.log(location);
+    setLong(location.coords.longitude);
+    setLat(location.coords.latitude);
+  }
 
   return (
     <View style={styles.container}>
@@ -41,9 +32,9 @@ export default function App() {
         showsPointsOfInterest={false}
       >
         <Marker
-          title="Seneca College Newnham Campus"
-          description="Educational Institute"
-          coordinate={{ latitude: latitude, longitude: longitude }}
+          coordinate={{ latitude: lat, longitude: long }}
+          title="Mykhailo"
+          description="Here I am"
         />
       </MapView>
     </View>
@@ -59,7 +50,7 @@ const styles = StyleSheet.create({
   },
 
   mapView: {
-    alignSelf: "stretch",
-    height: "100%",
+    height: "20%",
+    width: "100%"
   },
 });
