@@ -1,16 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import MapView, { Circle, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
 export default function App() {
-  const [long, setLong] = useState("");
-  const [lat, setLat] = useState("");
-  const [radius, setRadius] = useState(1500)
+  const [long, setLong] = useState(10);
+  const [lat, setLat] = useState(44);
+  const [radius, setRadius] = useState(1500);
+  const mapView = useRef(null);
 
   useEffect(() => {
     getLocation();
   }, []);
+
+  useEffect(() => {
+    mapView.current?.animateToRegion(
+      {
+        latitude: lat,
+        longitude: long,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
+      },
+      250
+    );
+  }, [mapView.current, lat, long]);
 
   async function getLocation() {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -27,6 +40,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapView}
         style={styles.mapView}
         showsUserLocation
         followUserLocation
@@ -52,7 +66,7 @@ const styles = StyleSheet.create({
   },
 
   mapView: {
-    height: "20%",
-    width: "100%"
+    height: "100%",
+    width: "100%",
   },
 });
