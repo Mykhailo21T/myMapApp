@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Circle, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
 export default function App() {
   const [long, setLong] = useState("");
   const [lat, setLat] = useState("");
+  const [radius, setRadius] = useState(1500)
 
   useEffect(() => {
     getLocation();
@@ -36,6 +37,7 @@ export default function App() {
           title="Mykhailo"
           description="Here I am"
         />
+        <Circle center={{ latitude: lat, longitude: long }} radius={radius} />
       </MapView>
     </View>
   );
