@@ -7,12 +7,12 @@ import { Slider, Icon } from "@rneui/themed";
 export default function App() {
   const [long, setLong] = useState(10);
   const [lat, setLat] = useState(44);
-  const [radius, setRadius] = useState(1000);
-  const [value, setValue] = useState(0);
+  const [radius, setRadius] = useState(500);
+
   const mapView = useRef(null);
 
   const interpolate = (start, end) => {
-    let k = (value - 0) / 10; // 0 =>min  && 10 => MAX
+    let k = (radius - 0) / 10; // 0 =>min  && 10 => MAX
     return Math.ceil((1 - k) * start + k * end) % 256;
   };
 
@@ -74,8 +74,8 @@ export default function App() {
       </MapView>
       <View style={[styles.contentView]}>
         <Slider
-          value={value}
-          onValueChange={setValue, setRadius}
+          value={radius}
+          onValueChange={setRadius}
           maximumValue={1000}
           minimumValue={0}
           step={1}
