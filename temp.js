@@ -1,21 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, StyleSheet, Text, TextInput, View, FlatList } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import MapView, { Circle, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { Slider, Icon } from "@rneui/themed";
+import { RadioGroup, RadioButton, FlatList } from "react-native";
 
 export default function App() {
   const [long, setLong] = useState(10);
   const [lat, setLat] = useState(44);
   const [radius, setRadius] = useState(500);
-  const [show,setShow] = useState("map")
-  const [fethcData, setFetchData] = useState([])
-
   const mapView = useRef(null);
+  const [selectedValue, setSelectedValue] = useState("map");
+  const [data, setData] = useState([]);
 
   const interpolate = (start, end) => {
     let k = (radius - 0) / 10; // 0 =>min  && 10 => MAX
     return Math.ceil((1 - k) * start + k * end) % 256;
+  };
+
+  const handleRadioButtonChange = (value) => {
+    setSelectedValue(value);
+  };
+
+  const fetchData = async () => {
+    // Fetch data from Firebase and update the state
+    const fetchedData = await fetch(
+      "https://evento-a583e-default-rtdb.europe-west1.firebasedatabase.app/posts.json"
+    );
+    const data = await response.json();
+    setData(data);
   };
 
   const color = () => {
@@ -25,29 +38,13 @@ export default function App() {
     return `rgb(${r},${g},${b})`;
   };
 
-  const ftchData = async () => {
-    // Fetch data from Firebase and update the state
-    const response = await fetch(
-      "https://evento-a583e-default-rtdb.europe-west1.firebasedatabase.app/posts.json"
-    );
-    const data = await response.json();
-    const postsArray = Object.keys(data).map((key) => ({
-      id: key,
-      ...data[key],
-    })); // from object to array
-    postsArray.sort((postA, postB) => postB.createdAt - postA.createdAt); // sort by timestamp/ createdBy
-    console.log(postsArray);
-    setFetchData(postsArray);
-  };
-
-  useEffect(() => {
-    ftchData();
-  }, [radius]);
-
   useEffect(() => {
     getLocation();
   }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
     mapView.current?.animateToRegion(
@@ -75,7 +72,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {show == "map" ? (
+      <RadioGroup onValueChange={handleRadioButtonChange} value={selectedValue}>
+        <RadioButton value="map" label="Map" />
+        <RadioButton value="list" label="List" />
+      </RadioGroup>
+      {selectedValue === "map" ? (
         <MapView
           ref={mapView}
           style={styles.mapView}
@@ -97,28 +98,17 @@ export default function App() {
         </MapView>
       ) : (
         <FlatList
-          data={fethcData}
+          data={data}
           renderItem={({ item }) => (
             <View>
-              <Text>{item.caption}</Text>
+              <Text>{item.title}</Text>
               <Text>{item.description}</Text>
             </View>
           )}
           keyExtractor={(item) => item.id}
         />
       )}
-      <Button
-        title="map"
-        onPress={() => {
-          setShow("map");
-        }}
-      ></Button>
-      <Button
-        title="list"
-        onPress={() => {
-          setShow("list");
-        }}
-      ></Button>
+
       <View style={[styles.contentView]}>
         <Slider
           value={radius}
