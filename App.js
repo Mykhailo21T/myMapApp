@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, StyleSheet, Text, TextInput, View, FlatList } from "react-native";
+import { Button, StyleSheet, Text, TextInput, View, FlatList, Image } from "react-native";
 import MapView, { Circle, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { Slider, Icon } from "@rneui/themed";
@@ -28,7 +28,7 @@ export default function App() {
   const ftchData = async () => {
     // Fetch data from Firebase and update the state
     const response = await fetch(
-      "https://evento-a583e-default-rtdb.europe-west1.firebasedatabase.app/posts.json"
+      "https://evento-a583e-default-rtdb.europe-west1.firebasedatabase.app/nightLife.json"
     );
     const data = await response.json();
     const postsArray = Object.keys(data).map((key) => ({
@@ -36,7 +36,6 @@ export default function App() {
       ...data[key],
     })); // from object to array
     postsArray.sort((postA, postB) => postB.createdAt - postA.createdAt); // sort by timestamp/ createdBy
-    console.log(postsArray);
     setFetchData(postsArray);
   };
 
@@ -68,7 +67,6 @@ export default function App() {
       return;
     }
     const location = await Location.getCurrentPositionAsync();
-    console.log(location);
     setLong(location.coords.longitude);
     setLat(location.coords.latitude);
   }
@@ -100,8 +98,14 @@ export default function App() {
           data={fethcData}
           renderItem={({ item }) => (
             <View>
-              <Text>{item.caption}</Text>
-              <Text>{item.description}</Text>
+              <Text>{item.id}</Text>
+              <Text>{item.address}</Text>
+              <Image source={{uri:item.image}} style={
+                {
+                  width: 200,
+                  height:200
+                }
+              }></Image>
             </View>
           )}
           keyExtractor={(item) => item.id}
