@@ -12,6 +12,7 @@ import MapView, { Circle, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { Slider, Icon } from "@rneui/themed";
 import DropDownPicker from "react-native-dropdown-picker";
+import FlatListComponent from "react-native";
 
 export default function App() {
   const [long, setLong] = useState(10);
@@ -63,10 +64,10 @@ export default function App() {
   }, []);
 
   const markers = () => {
-    let tempNear = fethcData.filter((element) => {
-      let distance = Math.sqrt(
-        Math.pow(element.coordinate.lat - lat) +
-          Math.pow(element.coordinate.long - long)
+    const tempNear = fethcData.filter((element) => {
+      const distance = Math.sqrt(
+        Math.pow(element.location.lat - lat, 2) + // Squaring the difference
+          Math.pow(element.location.long - long, 2) // Squaring the difference
       );
       return distance <= radius;
     });
@@ -75,17 +76,19 @@ export default function App() {
 
   const MarkersMap = () => {
     console.log(fethcData);
-    return fethcData.map((element) => {
+    return fethcData.map((element) => (
       <Marker
+        key={element.id} // Add a unique key prop for each marker
         coordinate={{
           latitude: Number(element.location.lat),
           longitude: Number(element.location.long),
         }}
-        title={element}
+        title={element.id} // You might want to change this to the appropriate property of your data
         description={element.description}
-      />;
-    });
+      />
+    ));
   };
+
 
   useEffect(() => {
     mapView.current?.animateToRegion(
