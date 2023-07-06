@@ -62,6 +62,31 @@ export default function App() {
     getLocation();
   }, []);
 
+  const markers = () => {
+    let tempNear = fethcData.filter((element) => {
+      let distance = Math.sqrt(
+        Math.pow(element.coordinate.lat - lat) +
+          Math.pow(element.coordinate.long - long)
+      );
+      return distance <= radius;
+    });
+    setFetchData(tempNear);
+  };
+
+  const MarkersMap = () => {
+    console.log(fethcData);
+    return fethcData.map((element) => {
+      <Marker
+        coordinate={{
+          latitude: Number(element.location.lat),
+          longitude: Number(element.location.long),
+        }}
+        title={element}
+        description={element.description}
+      />;
+    });
+  };
+
   useEffect(() => {
     mapView.current?.animateToRegion(
       {
@@ -100,6 +125,7 @@ export default function App() {
             title="title"
             description="Here I am"
           />
+          <MarkersMap />
           <Circle
             center={{ latitude: lat, longitude: long }}
             radius={radius}
@@ -135,7 +161,7 @@ export default function App() {
       <Button
         title="list"
         onPress={() => {
-          ftchData()
+          ftchData();
           setShow("list");
         }}
       ></Button>
@@ -143,7 +169,7 @@ export default function App() {
         <Slider
           value={radius}
           onValueChange={setRadius}
-          maximumValue={1000}
+          maximumValue={10000}
           minimumValue={0}
           step={1}
           allowTouchTrack
@@ -194,5 +220,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "stretch",
   },
-  
 });
