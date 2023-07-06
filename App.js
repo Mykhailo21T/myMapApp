@@ -3,6 +3,8 @@ import { Button, StyleSheet, Text, TextInput, View, FlatList, Image } from "reac
 import MapView, { Circle, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { Slider, Icon } from "@rneui/themed";
+import RNPickerSelect from 'react-native-picker-select';
+
 
 export default function App() {
   const [long, setLong] = useState(10);
@@ -10,9 +12,15 @@ export default function App() {
   const [radius, setRadius] = useState(500);
   const [show,setShow] = useState("map")
   const [fethcData, setFetchData] = useState([])
-
+  const [category, setCategory] = useState("nightLife")
   const mapView = useRef(null);
 
+  
+  //const dropdownOptions = [
+  //  { label: "Museums", value: "museum" },
+  //  { label: "Night life", value: "nightLife" }
+  //];
+  
   const interpolate = (start, end) => {
     let k = (radius - 0) / 10; // 0 =>min  && 10 => MAX
     return Math.ceil((1 - k) * start + k * end) % 256;
@@ -28,7 +36,7 @@ export default function App() {
   const ftchData = async () => {
     // Fetch data from Firebase and update the state
     const response = await fetch(
-      "https://evento-a583e-default-rtdb.europe-west1.firebasedatabase.app/nightLife.json"
+      `https://evento-a583e-default-rtdb.europe-west1.firebasedatabase.app/${category}.json`
     );
     const data = await response.json();
     const postsArray = Object.keys(data).map((key) => ({
@@ -73,6 +81,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      
       {show == "map" ? (
         <MapView
           ref={mapView}
@@ -100,12 +109,13 @@ export default function App() {
             <View>
               <Text>{item.id}</Text>
               <Text>{item.address}</Text>
-              <Image source={{uri:item.image}} style={
-                {
+              <Image
+                source={{ uri: item.image }}
+                style={{
                   width: 200,
-                  height:200
-                }
-              }></Image>
+                  height: 200,
+                }}
+              ></Image>
             </View>
           )}
           keyExtractor={(item) => item.id}
