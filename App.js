@@ -1,26 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, StyleSheet, Text, TextInput, View, FlatList, Image } from "react-native";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  FlatList,
+  Image,
+} from "react-native";
 import MapView, { Circle, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { Slider, Icon } from "@rneui/themed";
-import RNPickerSelect from 'react-native-picker-select';
-
+import DropDownPicker from "react-native-dropdown-picker";
 
 export default function App() {
   const [long, setLong] = useState(10);
   const [lat, setLat] = useState(44);
   const [radius, setRadius] = useState(500);
-  const [show,setShow] = useState("map")
-  const [fethcData, setFetchData] = useState([])
-  const [category, setCategory] = useState("nightLife")
+  const [show, setShow] = useState("map");
+  const [fethcData, setFetchData] = useState([]);
+  const [category, setCategory] = useState("nightLife");
   const mapView = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    { label: "Museums", value: "museum" },
+    { label: "Night life", value: "nightLife" },
+  ]);
 
-  
-  //const dropdownOptions = [
-  //  { label: "Museums", value: "museum" },
-  //  { label: "Night life", value: "nightLife" }
-  //];
-  
   const interpolate = (start, end) => {
     let k = (radius - 0) / 10; // 0 =>min  && 10 => MAX
     return Math.ceil((1 - k) * start + k * end) % 256;
@@ -55,7 +62,6 @@ export default function App() {
     getLocation();
   }, []);
 
-
   useEffect(() => {
     mapView.current?.animateToRegion(
       {
@@ -81,7 +87,6 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      
       {show == "map" ? (
         <MapView
           ref={mapView}
@@ -130,6 +135,7 @@ export default function App() {
       <Button
         title="list"
         onPress={() => {
+          ftchData()
           setShow("list");
         }}
       ></Button>
@@ -157,6 +163,15 @@ export default function App() {
           }}
         />
       </View>
+      <DropDownPicker
+        style={styles.dropD}
+        open={open}
+        value={category}
+        items={items}
+        setOpen={setOpen}
+        setValue={setCategory}
+        setItems={setItems}
+      />
     </View>
   );
 }
@@ -179,4 +194,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "stretch",
   },
+  
 });
